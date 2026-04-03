@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FORGE — Transform in 30 Days</title>
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --border: rgba(255,255,255,0.07);
+      --text: #f0f0f0;
+      --muted: #666;
+      --accent: #e8ff47;
+      --accent-dim: rgba(232,255,71,0.12);
+      --red: #ff4444;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+      width: 100%;
+    }
+
+    /* CUSTOM CURSOR — desktop only */
+    .cursor, .cursor-ring { display: none; }
+    @media (pointer: fine) {
+      .cursor {
+        display: block; opacity: 0;
+        position: fixed; width: 10px; height: 10px;
+        background: var(--accent); border-radius: 50%;
+        pointer-events: none; z-index: 9999;
+        transform: translate(-50%, -50%);
+      }
+      .cursor-ring {
+        display: block; opacity: 0;
+        position: fixed; width: 36px; height: 36px;
+        border: 1px solid rgba(232,255,71,0.4); border-radius: 50%;
+        pointer-events: none; z-index: 9998;
+        transform: translate(-50%, -50%);
+      }
+    }
+
+    /* GRAIN */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 100; opacity: 0.6;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px;
+      background: linear-gradient(to bottom, rgba(10,10,10,0.97), transparent);
+    }
+    .nav-logo { text-decoration: none; display: flex; align-items: center; }
+    .nav-logo img { height: 144px; width: auto; filter: invert(1); opacity: 0.92; }
+    .nav-tag {
+      font-family: 'DM Mono', monospace; font-size: 10px;
+      color: var(--muted); letter-spacing: 2px; text-transform: uppercase;
+    }
+    @media (min-width: 768px) {
+      nav { padding: 20px 48px; }
+      .nav-logo img { height: 144px; }
+      .nav-tag { font-size: 11px; }
+    }
+
+    /* HERO */
+    .hero {
+      min-height: 100svh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 100px 20px 100px;
+      position: relative; text-align: center; overflow: hidden;
+    }
+    .hero::after {
+      content: '';
+      position: absolute; width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(232,255,71,0.08) 0%, transparent 70%);
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+      pointer-events: none; animation: pulse 6s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.6; transform: translate(-50%,-50%) scale(1); }
+      50% { opacity: 1; transform: translate(-50%,-50%) scale(1.15); }
+    }
+    @media (min-width: 768px) {
+      .hero { padding: 140px 24px 100px; }
+      .hero::after { width: 600px; height: 600px; }
+    }
+
+    .hero-eyebrow {
+      font-family: 'DM Mono', monospace; font-size: 10px;
+      letter-spacing: 3px; color: var(--accent); text-transform: uppercase;
+      margin-bottom: 20px; opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.2s;
+    }
+    @media (min-width: 768px) { .hero-eyebrow { font-size: 11px; letter-spacing: 4px; margin-bottom: 28px; } }
+
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(72px, 20vw, 180px);
+      line-height: 0.88; letter-spacing: 2px; color: var(--text);
+      margin-bottom: 20px; opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.4s;
+    }
+    .hero-title .line2 { color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.25); }
+    @media (min-width: 768px) { .hero-title { margin-bottom: 32px; } }
+
+    .hero-sub {
+      font-size: 15px; font-weight: 300; color: var(--muted);
+      max-width: 340px; line-height: 1.7; margin-bottom: 36px;
+      opacity: 0; animation: fadeUp 0.8s ease forwards 0.6s;
+    }
+    .hero-sub strong { color: var(--text); font-weight: 500; }
+    @media (min-width: 768px) { .hero-sub { font-size: 17px; max-width: 480px; margin-bottom: 52px; } }
+
+    /* FORM */
+    .waitlist-form {
+      display: flex; flex-direction: column; gap: 10px;
+      width: 100%; max-width: 440px;
+      opacity: 0; animation: fadeUp 0.8s ease forwards 0.8s;
+      padding: 0 4px;
+    }
+    .form-row { display: flex; flex-direction: column; gap: 10px; }
+    @media (min-width: 480px) { .form-row { flex-direction: row; } }
+
+    .form-input {
+      width: 100%; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: 15px 18px; font-family: 'DM Sans', sans-serif;
+      font-size: 16px; font-weight: 300; color: var(--text);
+      outline: none; transition: border-color 0.2s;
+      -webkit-appearance: none;
+    }
+    .form-input::placeholder { color: #444; }
+    .form-input:focus { border-color: rgba(232,255,71,0.4); }
+
+    .form-btn {
+      width: 100%; background: var(--accent); color: #0a0a0a;
+      border: none; border-radius: 10px; padding: 16px 28px;
+      font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; letter-spacing: 0.3px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .form-btn:hover { background: #f5ff6e; }
+    .form-btn:active { transform: scale(0.98); }
+    .form-btn:disabled { opacity: 0.5; }
+
+    .form-note {
+      font-family: 'DM Mono', monospace; font-size: 10px;
+      color: #444; text-align: center; letter-spacing: 1px;
+    }
+
+    /* SUCCESS */
+    .success-card {
+      background: var(--surface); border: 1px solid rgba(232,255,71,0.2);
+      border-radius: 16px; padding: 32px 24px; text-align: center;
+      max-width: 440px; width: 100%;
+      opacity: 0; animation: fadeUp 0.5s ease forwards;
+    }
+    .success-position {
+      font-family: 'Bebas Neue', sans-serif; font-size: 72px;
+      color: var(--accent); line-height: 1; margin-bottom: 4px;
+    }
+    .success-label {
+      font-family: 'DM Mono', monospace; font-size: 11px;
+      letter-spacing: 3px; color: var(--muted); text-transform: uppercase; margin-bottom: 20px;
+    }
+    .success-msg { font-size: 15px; color: var(--muted); line-height: 1.6; }
+    .success-msg strong { color: var(--text); }
+
+    /* WHATSAPP BUTTON */
+    .whatsapp-btn {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+      padding: 14px 24px;
+      background: #25D366;
+      color: #fff;
+      border-radius: 10px;
+      text-decoration: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      transition: background 0.2s, transform 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .whatsapp-btn.visible { display: flex; }
+    .whatsapp-btn:hover { background: #1ebe5d; transform: translateY(-1px); }
+    .whatsapp-btn:active { transform: scale(0.98); }
+    .whatsapp-btn svg { width: 20px; height: 20px; fill: #fff; flex-shrink: 0; }
+    .whatsapp-tag {
+      display: none;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: #25D366;
+      letter-spacing: 1px;
+      text-align: center;
+      margin-top: 10px;
+    }
+    .whatsapp-tag.visible { display: block; }
+
+    /* SCROLL INDICATOR */
+    .scroll-hint {
+      position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 0;
+      opacity: 0; animation: fadeIn 1s ease forwards 1.6s;
+    }
+    .scroll-line {
+      width: 2px; height: 48px; background: rgba(232,255,71,0.6);
+      animation: scrollLine 2s ease-in-out infinite;
+    }
+    .scroll-arrow {
+      width: 10px; height: 10px;
+      border-right: 2px solid rgba(232,255,71,0.6);
+      border-bottom: 2px solid rgba(232,255,71,0.6);
+      transform: rotate(45deg); margin-top: -6px;
+      animation: scrollLine 2s ease-in-out infinite;
+    }
+    @keyframes scrollLine { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+
+    /* DIVIDER */
+    .divider { width: 100%; height: 1px; background: var(--border); }
+
+    /* SECTION */
+    section { padding: 64px 20px; max-width: 1100px; margin: 0 auto; }
+    @media (min-width: 768px) { section { padding: 100px 24px; } }
+
+    .section-label {
+      font-family: 'DM Mono', monospace; font-size: 10px;
+      letter-spacing: 4px; color: var(--accent); text-transform: uppercase; margin-bottom: 16px;
+    }
+    @media (min-width: 768px) { .section-label { font-size: 11px; margin-bottom: 20px; } }
+
+    /* PROBLEM */
+    .problem-section { display: flex; flex-direction: column; gap: 40px; }
+    @media (min-width: 768px) {
+      .problem-section { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+    }
+    .problem-heading {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(44px, 10vw, 80px); line-height: 0.95; letter-spacing: 1px;
+    }
+    .problem-heading .accent { color: var(--accent); }
+    .problem-list { display: flex; flex-direction: column; gap: 24px; }
+    @media (min-width: 768px) { .problem-list { gap: 28px; } }
+    .problem-item {
+      display: flex; gap: 16px; align-items: flex-start;
+      opacity: 1; transform: translateX(0); transition: all 0.6s ease;
+    }
+    .problem-num {
+      font-family: 'DM Mono', monospace; font-size: 11px;
+      color: var(--accent); margin-top: 4px; min-width: 24px;
+    }
+    .problem-text { font-size: 15px; color: var(--muted); line-height: 1.6; }
+    .problem-text strong { color: var(--text); font-weight: 500; display: block; margin-bottom: 4px; }
+
+    /* FEATURES */
+    .features-grid {
+      display: flex; flex-direction: column; gap: 2px; margin-top: 36px;
+    }
+    @media (min-width: 768px) {
+      .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 52px; }
+    }
+    .feature-card {
+      background: var(--surface); padding: 28px 24px;
+      position: relative; overflow: hidden;
+      opacity: 1; transform: translateY(0); transition: all 0.6s ease;
+      border-radius: 0;
+    }
+    .feature-card:first-child { border-radius: 16px 16px 0 0; }
+    .feature-card:last-child { border-radius: 0 0 16px 16px; }
+    @media (min-width: 768px) {
+      .feature-card { padding: 40px 32px; }
+      .feature-card:first-child { border-radius: 16px 0 0 16px; }
+      .feature-card:last-child { border-radius: 0 16px 16px 0; }
+    }
+    .feature-card::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(232,255,71,0.04), transparent);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .feature-card:hover::before { opacity: 1; }
+    .feature-icon { font-size: 28px; margin-bottom: 16px; display: block; }
+    .feature-icon svg { transition: fill 0.2s, transform 0.2s; }
+    .feature-card:hover .feature-icon svg { fill: var(--text); transform: scale(1.1); }
+    .feature-title {
+      font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 1px; margin-bottom: 10px;
+    }
+    .feature-desc { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+    /* STATS BAR */
+    .stats-bar {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 28px 20px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 24px; text-align: center;
+      max-width: 1100px; margin: 0 auto;
+    }
+    @media (min-width: 768px) {
+      .stats-bar { grid-template-columns: repeat(3, 1fr); padding: 48px; gap: 40px; }
+    }
+    .stat-num {
+      font-family: 'Bebas Neue', sans-serif; font-size: 44px;
+      color: var(--accent); line-height: 1; margin-bottom: 6px;
+    }
+    @media (min-width: 768px) { .stat-num { font-size: 56px; } }
+    .stat-label {
+      font-family: 'DM Mono', monospace; font-size: 10px;
+      letter-spacing: 2px; color: var(--muted); text-transform: uppercase;
+    }
+    .stat-divider { display: none; }
+    @media (min-width: 768px) {
+      .stat-divider { display: block; width: 1px; background: var(--border); align-self: stretch; }
+    }
+
+    /* HOW IT WORKS */
+    .steps { display: flex; flex-direction: column; gap: 2px; margin-top: 36px; }
+    @media (min-width: 768px) {
+      .steps { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 52px; }
+    }
+    .step {
+      padding: 28px 24px; position: relative;
+      opacity: 1; transform: translateY(0); transition: all 0.6s ease;
+      background: var(--surface); border-radius: 0;
+    }
+    .step:first-child { border-radius: 16px 16px 0 0; }
+    .step:last-child { border-radius: 0 0 16px 16px; }
+    @media (min-width: 768px) {
+      .step { padding: 40px 32px; background: transparent; border-radius: 0; }
+      .step:first-child { border-radius: 0; }
+      .step:last-child { border-radius: 0; }
+    }
+    .step-number {
+      font-family: 'Bebas Neue', sans-serif; font-size: 80px;
+      color: rgba(255,255,255,0.04); line-height: 1;
+      position: absolute; top: 16px; right: 20px;
+    }
+    .step-label {
+      font-family: 'DM Mono', monospace; font-size: 10px;
+      letter-spacing: 3px; color: var(--accent); text-transform: uppercase; margin-bottom: 12px;
+    }
+    .step-title { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 1px; margin-bottom: 10px; }
+    .step-desc { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+    /* FINAL CTA */
+    .final-cta {
+      text-align: center; padding: 80px 20px; position: relative; overflow: hidden;
+    }
+    @media (min-width: 768px) { .final-cta { padding: 120px 24px; } }
+    .final-cta::before {
+      content: ''; position: absolute; width: 400px; height: 300px;
+      background: radial-gradient(ellipse, rgba(232,255,71,0.05) 0%, transparent 70%);
+      top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none;
+    }
+    .final-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(56px, 14vw, 130px); line-height: 0.92; margin-bottom: 20px;
+    }
+    .final-title .hollow { color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.2); }
+    .final-sub {
+      font-size: 15px; color: var(--muted); margin-bottom: 36px;
+      max-width: 340px; margin-left: auto; margin-right: auto;
+    }
+    @media (min-width: 768px) { .final-sub { font-size: 16px; max-width: 400px; margin-bottom: 48px; } }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 20px;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 20px; text-align: center;
+    }
+    @media (min-width: 768px) {
+      footer { flex-direction: row; justify-content: space-between; padding: 48px; }
+    }
+    .footer-logo img { height: 144px; width: auto; filter: brightness(0) invert(1); opacity: 0.35; }
+    .footer-copy {
+      font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text);
+      letter-spacing: 1px; background: rgba(232,255,71,0.05);
+      padding: 10px 18px; border-radius: 8px; border: 1px solid rgba(232,255,71,0.08);
+    }
+    .footer-icons { display: flex; gap: 20px; align-items: center; }
+    .footer-icon { color: #444; transition: color 0.2s; display: flex; align-items: center; }
+    .footer-icon:hover { color: var(--accent); }
+    .footer-icon svg { width: 20px; height: 20px; fill: currentColor; }
+
+    /* MOCKUP */
+    .mockup-section {
+      padding: 48px 20px 0; max-width: 1100px; margin: 0 auto;
+      display: flex; justify-content: center; overflow: hidden;
+    }
+    @media (min-width: 768px) { .mockup-section { padding: 80px 24px 0; } }
+    .mockup-wrap {
+      position: relative; display: flex;
+      justify-content: center; gap: 12px; align-items: flex-end;
+    }
+    @media (min-width: 768px) { .mockup-wrap { gap: 32px; } }
+
+    /* Mobile: only show center phone */
+    .phone-frame.side { display: none; }
+    @media (min-width: 600px) { .phone-frame.side { display: block; } }
+
+    .phone-frame {
+      width: 200px; height: 430px; background: #141414;
+      border-radius: 36px; border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 40px 100px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06);
+      overflow: hidden; position: relative; flex-shrink: 0;
+    }
+    .phone-frame.center {
+      width: min(72vw, 240px); height: auto; aspect-ratio: 9/19.5;
+      border-radius: 32px; z-index: 2;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.7), 0 0 40px rgba(232,255,71,0.06), inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+    @media (min-width: 600px) {
+      .phone-frame { width: 180px; height: 385px; }
+      .phone-frame.center { width: 220px; height: 473px; aspect-ratio: unset; border-radius: 40px; }
+      .phone-frame.side { opacity: 0.55; transform: scale(0.93) translateY(24px); filter: blur(0.5px); }
+    }
+    @media (min-width: 768px) {
+      .phone-frame { width: 200px; height: 430px; }
+      .phone-frame.center { width: 240px; height: 516px; }
+    }
+
+    .mockup-glow {
+      position: absolute; width: 200px; height: 150px;
+      background: radial-gradient(ellipse, rgba(232,255,71,0.08) 0%, transparent 70%);
+      bottom: -30px; left: 50%; transform: translateX(-50%); pointer-events: none;
+    }
+    .mockup-label {
+      text-align: center; margin-top: 24px;
+      font-family: 'DM Mono', monospace; font-size: 9px;
+      letter-spacing: 3px; color: #333; text-transform: uppercase; padding-bottom: 60px;
+    }
+
+    /* STATS WRAPPER */
+    .stats-wrapper { padding: 48px 20px; max-width: 1100px; margin: 0 auto; }
+    @media (min-width: 768px) { .stats-wrapper { padding: 80px 24px; } }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* ERROR */
+    .form-error {
+      font-family: 'DM Mono', monospace; font-size: 11px;
+      color: var(--red); letter-spacing: 1px; text-align: center;
+    }
+
+    /* MOBILE */
+    @media (max-width: 768px) {
+      nav { padding: 20px 24px; }
+      .problem-section { grid-template-columns: 1fr; gap: 48px; }
+      .features-grid { grid-template-columns: 1fr; gap: 2px; }
+      .feature-card:first-child { border-radius: 16px 16px 0 0; }
+      .feature-card:last-child { border-radius: 0 0 16px 16px; }
+      .feature-card:not(:first-child):not(:last-child) { border-radius: 0; }
+      .steps { grid-template-columns: 1fr; }
+      .stats-bar { grid-template-columns: 1fr; }
+      .stat-divider { display: none; }
+      footer { flex-direction: column; gap: 24px; text-align: center; }
+      .footer-links { flex-wrap: wrap; justify-content: center; }
+      .form-row { flex-direction: column; }
+      .form-btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo"><img src="icon.png" alt="FORGE" /></a>
+    <span class="nav-tag">Coming Soon</span>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <p class="hero-eyebrow">AI-Powered Transformation</p>
+    <h1 class="hero-title">
+      TRANSFORM<br/>
+      <span class="line2">IN 30 DAYS</span>
+    </h1>
+    <p class="hero-sub">
+      Most fitness apps give everyone the <strong>same plan.</strong><br/>
+      FORGE builds yours around your body, your equipment,<br/>
+      your goals — then holds you to it every single day.
+    </p>
+
+    <div id="formWrapper" class="waitlist-form">
+      <div class="form-row">
+        <input class="form-input" id="nameInput" type="text" placeholder="Your name" autocomplete="off" />
+        <input class="form-input" id="emailInput" type="email" placeholder="Your email" autocomplete="off" required />
+      </div>
+      <button class="form-btn" id="submitBtn" onclick="handleSubmit()">
+        Join the Waitlist
+      </button>
+      <p id="formError" class="form-error" style="display:none;"></p>
+      <p class="form-note">No spam. Ever. You'll only hear from us when it matters.</p>
+    </div>
+
+    <div id="successWrapper" style="display:none; width:100%; max-width:440px;">
+      <div class="success-card">
+        <div class="success-position" id="positionNum">#—</div>
+        <div class="success-label">Your waitlist position</div>
+        <p class="success-msg">
+          You're locked in. We'll email <strong id="confirmedEmail"></strong> the moment FORGE goes live.<br/><br/>
+          Get ready.
+        </p>
+        <a id="whatsappBtn1" href="https://whatsapp.com/channel/0029Vb8IR7u9Bb5t2C02jn3v" target="_blank" class="whatsapp-btn">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Join the Exclusive Channel
+        </a>
+        <p id="whatsappTag1" class="whatsapp-tag">Only for the first 100 members</p>
+      </div>
+    </div>
+
+    <div class="scroll-hint">
+      <div class="scroll-line"></div>
+      <div class="scroll-arrow"></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- STATS -->
+  <div class="stats-wrapper">
+    <div class="stats-bar">
+      <div>
+        <div class="stat-num" id="waitlistCount">—</div>
+        <div class="stat-label">On the Waitlist</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div>
+        <div class="stat-num">30</div>
+        <div class="stat-label">Day Transformation</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div>
+        <div class="stat-num">100%</div>
+        <div class="stat-label">AI Personalized</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- APP MOCKUP -->
+  <div class="mockup-section">
+    <div style="width:100%;">
+      <div class="mockup-wrap">
+
+        <!-- LEFT PHONE — Habit Tracker -->
+        <div class="phone-frame side">
+          <img src="Screenshot_20260403-073059_Chrome.jpg" alt="FORGE Habit Tracker"
+            style="width:100%; height:100%; object-fit:cover; object-position:top; border-radius:36px; display:block;" />
+        </div>
+
+        <!-- CENTER PHONE — Home (hero) -->
+        <div class="phone-frame center">
+          <img src="Screenshot_20260403-073037_Chrome.jpg" alt="FORGE Home"
+            style="width:100%; height:100%; object-fit:cover; object-position:top; border-radius:40px; display:block;" />
+        </div>
+
+        <!-- RIGHT PHONE — Vault -->
+        <div class="phone-frame side">
+          <img src="Screenshot_20260403-073131_Chrome.png" alt="FORGE Vault"
+            style="width:100%; height:100%; object-fit:cover; object-position:top; border-radius:36px; display:block;" />
+        </div>
+
+        <div class="mockup-glow"></div>
+      </div>
+      <p class="mockup-label">App preview — design subject to change</p>
+    </div>
+  </div>
+
+  <!-- PROBLEM -->
+  <section>
+    <div class="problem-section">
+      <div>
+        <p class="section-label">The Problem</p>
+        <h2 class="problem-heading">
+          EVERY OTHER<br/>
+          APP IS LYING<br/>
+          TO <span class="accent">YOU.</span>
+        </h2>
+      </div>
+      <div class="problem-list">
+        <div class="problem-item">
+          <span class="problem-num">01</span>
+          <div class="problem-text">
+            <strong>Generic plans, generic results</strong>
+            Cookie-cutter programs built for nobody in particular. They don't know your equipment, your body, or your schedule.
+          </div>
+        </div>
+        <div class="problem-item">
+          <span class="problem-num">02</span>
+          <div class="problem-text">
+            <strong>YouTube left you guessing</strong>
+            Endless videos, zero structure. You finish a workout and still don't know if you're progressing.
+          </div>
+        </div>
+        <div class="problem-item">
+          <span class="problem-num">03</span>
+          <div class="problem-text">
+            <strong>You've started before. You didn't finish.</strong>
+            Not because you're weak — because nothing held you accountable. No streaks, no checkpoints, no system.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- FEATURES -->
+  <section>
+    <p class="section-label">What FORGE Gives You</p>
+    <h2 style="font-family:'Bebas Neue',sans-serif; font-size:clamp(44px,6vw,72px); line-height:0.95; letter-spacing:1px; max-width:500px; margin-bottom:8px;">
+      THREE PILLARS.<br/>ONE SYSTEM.
+    </h2>
+    <p style="color:var(--muted); font-size:15px; margin-bottom:0;">Built for total transformation — not just your biceps.</p>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;fill:var(--accent);"><path d="M13 2L4.09 12.97H11L10 22L20.09 11H13L13 2Z"/></svg>
+        </span>
+        <div class="feature-title">AI-Personalized Plans</div>
+        <p class="feature-desc">Answer 7 questions. Get a 30-day plan built entirely around your body, equipment, and goals. No templates. No filler. Real AI, real personalization.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;fill:var(--accent);"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+        </span>
+        <div class="feature-title">Daily Habit Tracker</div>
+        <p class="feature-desc">Five habits extracted from your plan. Check them off daily. Build streaks. Watch consistency become identity — not just a goal.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;fill:var(--accent);"><path d="M3 13h2v8H3v-8zm4-6h2v14H7V7zm4 3h2v11h-2V10zm4-7h2v18h-2V3zm4 4h2v14h-2V7z"/></svg>
+        </span>
+        <div class="feature-title">Transformation Dashboard</div>
+        <p class="feature-desc">Your progress made visual. Completion rates, streak data, weekly variance. See yourself improving in real time.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- HOW IT WORKS -->
+  <section>
+    <p class="section-label">How It Works</p>
+    <h2 style="font-family:'Bebas Neue',sans-serif; font-size:clamp(44px,6vw,72px); line-height:0.95; letter-spacing:1px; margin-bottom:8px;">
+      SIMPLE BY DESIGN.
+    </h2>
+    <p style="color:var(--muted); font-size:15px;">No bloat. No confusion. Just progress.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-label">Step One</div>
+        <div class="step-title">Answer 7 Questions</div>
+        <p class="step-desc">Age, height, weight, activity level, equipment, face shape, hair type. Takes 90 seconds. No account needed to start.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-label">Step Two</div>
+        <div class="step-title">Get Your 30-Day Plan</div>
+        <p class="step-desc">FORGE's AI generates a full fitness, nutrition, and grooming plan personalized specifically to you. With weekly progression built in.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-label">Step Three</div>
+        <div class="step-title">Track It Daily</div>
+        <p class="step-desc">Check off your 5 daily habits. Build your streak. Come back tomorrow. Repeat for 30 days. Watch yourself change.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- FINAL CTA -->
+  <div class="final-cta">
+    <h2 class="final-title">
+      DON'T WAIT<br/>
+      <span class="hollow">TO START.</span>
+    </h2>
+    <p class="final-sub">The waitlist is filling up. Get early access before we launch publicly.</p>
+
+    <div id="formWrapper2" class="waitlist-form" style="margin: 0 auto;">
+      <div class="form-row">
+        <input class="form-input" id="nameInput2" type="text" placeholder="Your name" autocomplete="off" />
+        <input class="form-input" id="emailInput2" type="email" placeholder="Your email" autocomplete="off" required />
+      </div>
+      <button class="form-btn" id="submitBtn2" onclick="handleSubmit2()">
+        Secure My Spot
+      </button>
+      <p id="formError2" class="form-error" style="display:none;"></p>
+      <p class="form-note">No spam. Only a launch notification when FORGE goes live.</p>
+    </div>
+
+    <div id="successWrapper2" style="display:none; width:100%; max-width:440px; margin:0 auto;">
+      <div class="success-card">
+        <div class="success-position" id="positionNum2">#—</div>
+        <div class="success-label">Your waitlist position</div>
+        <p class="success-msg">You're locked in. We'll reach out the moment FORGE launches.</p>
+        <a id="whatsappBtn2" href="https://whatsapp.com/channel/0029Vb8IR7u9Bb5t2C02jn3v" target="_blank" class="whatsapp-btn">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Join the Exclusive Channel
+        </a>
+        <p id="whatsappTag2" class="whatsapp-tag">Only for the first 100 members</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo"><img src="icon.png" alt="FORGE" /></div>
+    <div class="footer-copy">© 2026 FORGE. All rights reserved.</div>
+    <div class="footer-icons">
+      <!-- Bolt / AI -->
+      <span class="footer-icon" title="AI-Powered">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 2L4.09 12.97H11L10 22L20.09 11H13L13 2Z"/></svg>
+      </span>
+      <!-- Checkmark / Habits -->
+      <span class="footer-icon" title="Habit Tracker">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+      </span>
+      <!-- Chart / Progress -->
+      <span class="footer-icon" title="Progress Dashboard">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 13h2v8H3v-8zm4-6h2v14H7V7zm4 3h2v11h-2V10zm4-7h2v18h-2V3zm4 4h2v14h-2V7z"/></svg>
+      </span>
+    </div>
+  </footer>
+
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    // ─── CURSOR ───────────────────────────────────────────
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let ringX = -100, ringY = -100;
+    let mouseX = -100, mouseY = -100;
+    let cursorVisible = false;
+
+    cursor.style.left = '-100px';
+    cursor.style.top = '-100px';
+    ring.style.left = '-100px';
+    ring.style.top = '-100px';
+
+    document.addEventListener('mousemove', e => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      cursor.style.left = mouseX + 'px';
+      cursor.style.top = mouseY + 'px';
+      if (!cursorVisible) {
+        cursor.style.opacity = '1';
+        ring.style.opacity = '1';
+        cursorVisible = true;
+      }
+    });
+
+    function animateRing() {
+      ringX += (mouseX - ringX) * 0.12;
+      ringY += (mouseY - ringY) * 0.12;
+      ring.style.left = ringX + 'px';
+      ring.style.top = ringY + 'px';
+      requestAnimationFrame(animateRing);
+    }
+    animateRing();
+
+    // ─── SCROLL ANIMATIONS ────────────────────────────────
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('visible'), i * 120);
+        }
+      });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.problem-item, .feature-card, .step').forEach(el => observer.observe(el));
+
+    // ─── SUPABASE CONFIG ──────────────────────────────────
+    // 🚨 REPLACE THESE WITH YOUR ACTUAL SUPABASE VALUES
+    const SUPABASE_URL = 'https://ovuzlhyowzldlffllppq.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92dXpsaHlvd3psZGxmZmxscHBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5NjA0OTIsImV4cCI6MjA4NzUzNjQ5Mn0.9Qa_4-FhPy9qk0OymOJnmFuSVvtl8yk4Ob0qja7oBbc
+';
+
+    // ─── FETCH WAITLIST COUNT ─────────────────────────────
+    async function fetchCount() {
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/public_waitlist?select=id`, {
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'Prefer': 'count=exact'
+          }
+        });
+        const count = res.headers.get('content-range')?.split('/')[1];
+        if (count) {
+          document.getElementById('waitlistCount').textContent = parseInt(count).toLocaleString();
+        }
+      } catch(e) {}
+    }
+    fetchCount();
+
+    // ─── SUBMIT LOGIC ─────────────────────────────────────
+    async function submitToWaitlist(email, name) {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/public_waitlist`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify({
+          email,
+          name: name || null,
+          referral_source: document.referrer || 'direct',
+          status: 'pending'
+        })
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        if (err.code === '23505') throw new Error('already_on_list');
+        throw new Error('server_error');
+      }
+
+      // Get position
+      const countRes = await fetch(`${SUPABASE_URL}/rest/v1/public_waitlist?select=id`, {
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Prefer': 'count=exact'
+        }
+      });
+      const count = countRes.headers.get('content-range')?.split('/')[1];
+      return parseInt(count) || '?';
+    }
+
+    async function handleSubmit() {
+      const email = document.getElementById('emailInput').value.trim();
+      const name = document.getElementById('nameInput').value.trim();
+      const btn = document.getElementById('submitBtn');
+      const errEl = document.getElementById('formError');
+
+      if (!email) return;
+      btn.disabled = true;
+      btn.textContent = 'Joining...';
+      errEl.style.display = 'none';
+
+      try {
+        const position = await submitToWaitlist(email, name);
+        document.getElementById('formWrapper').style.display = 'none';
+        document.getElementById('successWrapper').style.display = 'block';
+        document.getElementById('positionNum').textContent = '#' + position;
+        document.getElementById('confirmedEmail').textContent = email;
+        if (position <= 100) {
+          document.getElementById('whatsappBtn1').classList.add('visible');
+          document.getElementById('whatsappTag1').classList.add('visible');
+        }
+        fetchCount();
+      } catch(e) {
+        btn.disabled = false;
+        btn.textContent = 'Join the Waitlist';
+        errEl.style.display = 'block';
+        errEl.textContent = e.message === 'already_on_list'
+          ? "You're already on the list. We'll be in touch."
+          : 'Something went wrong. Please try again.';
+      }
+    }
+
+    async function handleSubmit2() {
+      const email = document.getElementById('emailInput2').value.trim();
+      const name = document.getElementById('nameInput2').value.trim();
+      const btn = document.getElementById('submitBtn2');
+      const errEl = document.getElementById('formError2');
+
+      if (!email) return;
+      btn.disabled = true;
+      btn.textContent = 'Securing...';
+      errEl.style.display = 'none';
+
+      try {
+        const position = await submitToWaitlist(email, name);
+        document.getElementById('formWrapper2').style.display = 'none';
+        document.getElementById('successWrapper2').style.display = 'block';
+        document.getElementById('positionNum2').textContent = '#' + position;
+        if (position <= 100) {
+          document.getElementById('whatsappBtn2').classList.add('visible');
+          document.getElementById('whatsappTag2').classList.add('visible');
+        }
+        fetchCount();
+      } catch(e) {
+        btn.disabled = false;
+        btn.textContent = 'Secure My Spot';
+        errEl.style.display = 'block';
+        errEl.textContent = e.message === 'already_on_list'
+          ? "You're already on the list."
+          : 'Something went wrong. Please try again.';
+      }
+    }
+
+    // Enter key support
+    document.getElementById('emailInput').addEventListener('keydown', e => { if (e.key === 'Enter') handleSubmit(); });
