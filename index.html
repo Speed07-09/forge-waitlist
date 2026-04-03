@@ -66,17 +66,18 @@
       position: fixed; top: 0; left: 0; right: 0; z-index: 50;
       display: flex; align-items: center; justify-content: space-between;
       padding: 16px 20px;
-      background: linear-gradient(to bottom, rgba(10,10,10,0.97), transparent);
+      background: rgba(10,10,10,0.98);
+      border-bottom: 1px solid var(--border);
     }
     .nav-logo { text-decoration: none; display: flex; align-items: center; }
-    .nav-logo img { height: 144px; width: auto; filter: invert(1); opacity: 0.92; }
+    .nav-logo img { height: 36px; width: auto; filter: invert(1); opacity: 0.92; }
     .nav-tag {
       font-family: 'DM Mono', monospace; font-size: 10px;
       color: var(--muted); letter-spacing: 2px; text-transform: uppercase;
     }
     @media (min-width: 768px) {
       nav { padding: 20px 48px; }
-      .nav-logo img { height: 144px; }
+      .nav-logo img { height: 64px; }
       .nav-tag { font-size: 11px; }
     }
 
@@ -391,7 +392,7 @@
     @media (min-width: 768px) {
       footer { flex-direction: row; justify-content: space-between; padding: 48px; }
     }
-    .footer-logo img { height: 144px; width: auto; filter: brightness(0) invert(1); opacity: 0.35; }
+    .footer-logo img { height: 35px; width: auto; filter: brightness(0) invert(1); opacity: 0.35; }
     .footer-copy {
       font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text);
       letter-spacing: 1px; background: rgba(232,255,71,0.05);
@@ -800,8 +801,8 @@
 
     // ─── SUPABASE CONFIG ──────────────────────────────────
     // 🚨 REPLACE THESE WITH YOUR ACTUAL SUPABASE VALUES
-    const SUPABASE_URL = 'https://ovuzlhyowzldlffllppq.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92dXpsaHlvd3psZGxmZmxscHBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5NjA0OTIsImV4cCI6MjA4NzUzNjQ5Mn0.9Qa_4-FhPy9qk0OymOJnmFuSVvtl8yk4Ob0qja7oBbc';
+    const SUPABASE_URL = 'YOUR_SUPABASE_URL_HERE';
+    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY_HERE';
 
     // ─── FETCH WAITLIST COUNT ─────────────────────────────
     async function fetchCount() {
