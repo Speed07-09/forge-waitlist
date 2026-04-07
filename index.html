@@ -65,7 +65,7 @@
     nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 50;
       display: flex; align-items: center; justify-content: space-between;
-      padding: 8px 20px;
+      padding: 6px 20px;
       background: rgba(10,10,10,0.98);
       border-bottom: 1px solid var(--border);
     }
@@ -76,7 +76,7 @@
       color: var(--muted); letter-spacing: 2px; text-transform: uppercase;
     }
     @media (min-width: 768px) {
-      nav { padding: 10px 48px; }
+      nav { padding: 8px 48px; }
       .nav-logo img { height: 128px; }
       .nav-tag { font-size: 11px; }
     }
@@ -572,19 +572,19 @@
 
         <!-- LEFT PHONE — Habit Tracker -->
         <div class="phone-frame side">
-          <img src="Screenshot_20260403-073059_Chrome.jpg" alt="FORGE Habit Tracker"
+          <img src="IMG-20260404-WA0088-left.png" alt="FORGE Habit Tracker"
             style="width:100%; height:100%; object-fit:cover; object-position:top; border-radius:36px; display:block;" />
         </div>
 
         <!-- CENTER PHONE — Home (hero) -->
         <div class="phone-frame center">
-          <img src="Screenshot_20260403-073037_Chrome.jpg" alt="FORGE Home"
+          <img src="IMG-20260404-WA0089-portrait.png" alt="FORGE Home"
             style="width:100%; height:100%; object-fit:cover; object-position:top; border-radius:40px; display:block;" />
         </div>
 
         <!-- RIGHT PHONE — Vault -->
         <div class="phone-frame side">
-          <img src="Screenshot_20260403-073131_Chrome.png" alt="FORGE Vault"
+          <img src="IMG-20260404-WA0088-left.png" alt="FORGE Tracker"
             style="width:100%; height:100%; object-fit:cover; object-position:top; border-radius:36px; display:block;" />
         </div>
 
@@ -801,8 +801,8 @@
 
     // ─── SUPABASE CONFIG ──────────────────────────────────
     // 🚨 REPLACE THESE WITH YOUR ACTUAL SUPABASE VALUES
-    const SUPABASE_URL = 'https://ovuzlhyowzldlffllppq.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92dXpsaHlvd3psZGxmZmxscHBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5NjA0OTIsImV4cCI6MjA4NzUzNjQ5Mn0.9Qa_4-FhPy9qk0OymOJnmFuSVvtl8yk4Ob0qja7oBbc';
+    const SUPABASE_URL = https://ovuzlhyowzldlffllppq.supabase.co;
+    const SUPABASE_ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92dXpsaHlvd3psZGxmZmxscHBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5NjA0OTIsImV4cCI6MjA4NzUzNjQ5Mn0.9Qa_4-FhPy9qk0OymOJnmFuSVvtl8yk4Ob0qja7oBbc;
 
     // ─── FETCH WAITLIST COUNT ─────────────────────────────
     async function fetchCount() {
