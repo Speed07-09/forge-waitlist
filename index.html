@@ -66,6 +66,7 @@
       position: fixed; top: 0; left: 0; right: 0; z-index: 50;
       display: flex; align-items: center; justify-content: space-between;
       padding: 6px 20px;
+      padding-top: calc(6px + env(safe-area-inset-top));
       background: rgba(10,10,10,0.98);
       border-bottom: 1px solid var(--border);
     }
@@ -420,24 +421,30 @@
     @media (min-width: 600px) { .phone-frame.side { display: block; } }
 
     .phone-frame {
-      width: 200px; height: 430px; background: #141414;
-      border-radius: 36px; border: 1px solid rgba(255,255,255,0.1);
-      box-shadow: 0 40px 100px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06);
-      overflow: hidden; position: relative; flex-shrink: 0;
+      flex-shrink: 0;
+      position: relative;
     }
-    .phone-frame.center {
-      width: min(72vw, 240px); height: auto; aspect-ratio: 9/19.5;
-      border-radius: 32px; z-index: 2;
-      box-shadow: 0 40px 80px rgba(0,0,0,0.7), 0 0 40px rgba(232,255,71,0.06), inset 0 1px 0 rgba(255,255,255,0.08);
+    .phone-frame img {
+      width: 200px; height: auto;
+      border-radius: 0; display: block;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+    }
+    .phone-frame.center img {
+      width: min(72vw, 260px);
+      box-shadow: 0 40px 100px rgba(0,0,0,0.7), 0 0 40px rgba(232,255,71,0.06);
+    }
+    .phone-frame.side {
+      opacity: 0.5;
+      transform: scale(0.88) translateY(28px);
+      filter: blur(0.5px);
     }
     @media (min-width: 600px) {
-      .phone-frame { width: 180px; height: 385px; }
-      .phone-frame.center { width: 220px; height: 473px; aspect-ratio: unset; border-radius: 40px; }
-      .phone-frame.side { opacity: 0.55; transform: scale(0.93) translateY(24px); filter: blur(0.5px); }
+      .phone-frame img { width: 180px; }
+      .phone-frame.center img { width: 220px; }
     }
     @media (min-width: 768px) {
-      .phone-frame { width: 200px; height: 430px; }
-      .phone-frame.center { width: 240px; height: 516px; }
+      .phone-frame img { width: 200px; }
+      .phone-frame.center img { width: 250px; }
     }
 
     .mockup-glow {
@@ -572,20 +579,17 @@
 
         <!-- LEFT PHONE — Habit Tracker -->
         <div class="phone-frame side">
-          <img src="IMG-20260404-WA0088-left.png" alt="FORGE Habit Tracker"
-            style="width:100%; height:100%; object-fit:cover; object-position:top; border-radius:36px; display:block;" />
+          <img src="IMG-20260404-WA0088-left.png" alt="FORGE Habit Tracker" />
         </div>
 
         <!-- CENTER PHONE — Home (hero) -->
         <div class="phone-frame center">
-          <img src="IMG-20260404-WA0089-portrait.png" alt="FORGE Home"
-            style="width:100%; height:100%; object-fit:cover; object-position:top; border-radius:40px; display:block;" />
+          <img src="IMG-20260404-WA0089-portrait.png" alt="FORGE Home" />
         </div>
 
         <!-- RIGHT PHONE — Vault -->
         <div class="phone-frame side">
-          <img src="IMG-20260404-WA0088-left.png" alt="FORGE Tracker"
-            style="width:100%; height:100%; object-fit:cover; object-position:top; border-radius:36px; display:block;" />
+          <img src="IMG-20260404-WA0088-left.png" alt="FORGE Tracker" />
         </div>
 
         <div class="mockup-glow"></div>
