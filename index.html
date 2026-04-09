@@ -71,14 +71,14 @@
       border-bottom: 1px solid var(--border);
     }
     .nav-logo { text-decoration: none; display: flex; align-items: center; }
-    .nav-logo img { height: 64px; width: auto; filter: invert(1); opacity: 0.92; }
+    .nav-logo img { height: 68px; width: auto; filter: invert(1); opacity: 0.92; }
     .nav-tag {
       font-family: 'DM Mono', monospace; font-size: 10px;
       color: var(--muted); letter-spacing: 2px; text-transform: uppercase;
     }
     @media (min-width: 768px) {
       nav { padding: 8px 48px; }
-      .nav-logo img { height: 64px; }
+      .nav-logo img { height: 68px; }
       .nav-tag { font-size: 11px; }
     }
 
@@ -393,7 +393,7 @@
     @media (min-width: 768px) {
       footer { flex-direction: row; justify-content: space-between; padding: 48px; }
     }
-    .footer-logo img { height: 128px; width: auto; filter: brightness(0) invert(1); opacity: 0.35; }
+    .footer-logo img { height: 68px; width: auto; filter: brightness(0) invert(1); opacity: 0.35; }
     .footer-copy {
       font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text);
       letter-spacing: 1px; background: rgba(232,255,71,0.05);
@@ -805,8 +805,8 @@
 
     // ─── SUPABASE CONFIG ──────────────────────────────────
     // 🚨 REPLACE THESE WITH YOUR ACTUAL SUPABASE VALUES
-    const SUPABASE_URL = https://ovuzlhyowzldlffllppq.supabase.co;
-    const SUPABASE_ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92dXpsaHlvd3psZGxmZmxscHBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5NjA0OTIsImV4cCI6MjA4NzUzNjQ5Mn0.9Qa_4-FhPy9qk0OymOJnmFuSVvtl8yk4Ob0qja7oBbc;
+    const SUPABASE_URL = 'https://ovuzlhyowzldlffllppq.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92dXpsaHlvd3psZGxmZmxscHBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5NjA0OTIsImV4cCI6MjA4NzUzNjQ5Mn0.9Qa_4-FhPy9qk0OymOJnmFuSVvtl8yk4Ob0qja7oBbc';
 
     // ─── FETCH WAITLIST COUNT ─────────────────────────────
     async function fetchCount() {
@@ -874,6 +874,12 @@
 
       try {
         const position = await submitToWaitlist(email, name);
+        // Send welcome email via Resend
+        fetch('/api/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, name, position })
+        }).catch(() => {}); // silent fail — don't block UI if email fails
         document.getElementById('formWrapper').style.display = 'none';
         document.getElementById('successWrapper').style.display = 'block';
         document.getElementById('positionNum').textContent = '#' + position;
@@ -906,6 +912,12 @@
 
       try {
         const position = await submitToWaitlist(email, name);
+        // Send welcome email via Resend
+        fetch('/api/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, name, position })
+        }).catch(() => {});
         document.getElementById('formWrapper2').style.display = 'none';
         document.getElementById('successWrapper2').style.display = 'block';
         document.getElementById('positionNum2').textContent = '#' + position;
